@@ -5,33 +5,37 @@ import { PrismaService } from 'prisma/Prisma.service';
 
 @Injectable()
 export class BookService {
+  constructor(private readonly prismaService: PrismaService) {}
 
-  constructor(private readonly prismaService :PrismaService){}
-
-  create(createBookDto: CreateBookDto) {
-    return  {
-      title:"sham chi aai",
-      author:'s',
-      yearOfPublication:2024,
-      price:19,
-      url:"s",
-      status:'true',
-    };
+  async create(createBookDto: CreateBookDto) {
+    return await this.prismaService.book.create({
+      data: {
+        ...createBookDto,
+        // userId: 1
+      }
+    });
   }
 
-  findAll() {
-    return `This action returns all book`;
+  async findAll() {
+    return await this.prismaService.book.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} book`;
+  async findOne(id: number) {
+    return await this.prismaService.book.findUnique({
+      where: { ISBN: id },
+    });
   }
 
-  update(id: number, updateBookDto: UpdateBookDto) {
-    return `This action updates a #${id} book`;
+  async update(id: number, updateBookDto: UpdateBookDto) {
+    return await this.prismaService.book.update({
+      where: { ISBN: id },
+      data: updateBookDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} book`;
+  async remove(id: number) {
+    return await this.prismaService.book.delete({
+      where: { ISBN: id },
+    });
   }
 }
