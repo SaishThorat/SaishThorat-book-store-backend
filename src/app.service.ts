@@ -5,4 +5,6 @@ export class AppService {
   getHello(): object {
     return {name:"chintan",rollno:10};
   }
+
+ 
 }

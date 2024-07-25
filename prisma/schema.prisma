@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+  password String 
+  phoneNumber String
+  roleId Int
+  token String
+  status String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime?
+  Role  Role   @relation("userRole", fields: [roleId], references: [id])
+  BookCreated Book[] @relation("createdBy")
+  OrderBook order[] @relation("orderBy")
+}
+
+
+model Role {
+   id    Int     @id @default(autoincrement())
+   rolename String
+   User User[] @relation("userRole")
+}
+
+model Book{
+  ISBN    Int     @id @default(autoincrement())
+  title String
+  author String
+  yearOfPublication String
+  userId Int
+  price Int
+  url String
+  status String
+  createdAt DateTime @default(now())
+  updatedAt DateTime?
+  createdBy User @relation("createdBy",fields: [userId],references: [id])
+  OrderBook order[] @relation("orderBook")
+}
+
+model order {
+     id    Int     @id @default(autoincrement())
+     orderType OrderTypeEnum
+     userId Int
+     bookId Int
+     user User @relation("orderBy",fields: [userId],references: [id])
+     Book Book @relation("orderBook",fields: [bookId],references: [ISBN])
+}
+
+enum OrderTypeEnum {
+ONLINE
+OFFLINE
+}
