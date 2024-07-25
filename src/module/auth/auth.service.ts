@@ -1,25 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-auth.dto';
+import * as bcryptjs from 'bcryptjs';
+import { PrismaService } from 'prisma/Prisma.service';
+import { LoginDto } from './dto/Login-auth.dto';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: any) {
-    return 'This action adds a new auth';
+
+  constructor (private readonly prismaService:PrismaService){}
+
+ async create(createAuthDto: CreateUserDto) {
+    const {password}=createAuthDto;
+    const salt = bcryptjs.genSaltSync(10);
+    const hashPass = bcryptjs.hashSync(password, salt);
+return await this.prismaService.user.create({
+  data:{
+    ...createAuthDto,password:hashPass,
+    token:null
+  }
+})
+}
+
+async login(loginInfo: LoginDto) {
+  const {email,password}=loginInfo;
+
+  const user=await this.prismaService.user.findUnique({where:{email}});
+
+  if(!user){
+   throw new UnauthorizedException(HttpStatus.UNAUTHORIZED);
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+const hashPass = bcryptjs.compareSync(password,user.password);
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+if(!hashPass){
+  throw new UnauthorizedException(HttpStatus.UNAUTHORIZED);
+}
+  return hashPass;
+}
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
 }
