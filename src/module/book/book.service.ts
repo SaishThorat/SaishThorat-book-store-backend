@@ -7,11 +7,11 @@ import { PrismaService } from 'prisma/Prisma.service';
 export class BookService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(createBookDto: CreateBookDto) {
+  async create(userId:number,createBookDto: CreateBookDto) {
     return await this.prismaService.book.create({
       data: {
         ...createBookDto,
-        // userId: 1
+        userId
       }
     });
   }
