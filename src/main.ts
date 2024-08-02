@@ -15,7 +15,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   const corsOptions: CorsOptions = {
-    origin: 'http://localhost:5174', // your frontend URL
+    origin: 'http://localhost:5173', // your frontend URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // if you need to include cookies
   };

@@ -20,9 +20,13 @@ export class BookService {
     return await this.prismaService.book.findMany();
   }
 
-  async findOne(id: number) {
-    return await this.prismaService.book.findUnique({
-      where: { ISBN: id },
+  async findAllbook() {
+    return await this.prismaService.books.findMany();
+  }
+
+  async findOne(id: string) {
+    return await this.prismaService.books.findUnique({
+      where: { Id: id },
     });
   }
 

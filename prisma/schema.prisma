@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,30 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique
-  name        String?
-  password    String
-  phoneNumber String
-  roleId      Int
-  token       String?
-  status      Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime?
-  Role        Role?     @relation("userRole", fields: [roleId], references: [id])
-  BookCreated Book[]    @relation("createdBy")
-  OrderBook   order[]   @relation("orderBy")
-}
+// model order {
+//   id        Int           @id @default(autoincrement())
+//   orderType OrderTypeEnum
+//   userId    Int?
+//   bookId    String?
+//   newBookID String?
+//   status    OrderStatus
+//   unit      Int
+//   Book      books?         @relation("orderBooks", fields: [newBookID], references: [Id])
+//   user      user?          @relation("orderBy", fields: [userId], references: [id])
+// }
 
-model Role {
-  id       Int     @id @default(autoincrement())
-  rolename String
-  status   Boolean @default(true)
-  User     User[]  @relation("userRole")
-}
-
-model Book {
+model book {
   ISBN              Int       @id @default(autoincrement())
   title             String
   author            String
@@ -47,20 +30,88 @@ model Book {
   status            Boolean   @default(true)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime?
-  createdBy         User?     @relation("createdBy", fields: [userId], references: [id])
-  OrderBook         order[]   @relation("orderBook")
+
 }
+
 
 model order {
   id        Int           @id @default(autoincrement())
   orderType OrderTypeEnum
   userId    Int?
-  bookId    Int
-  user      User?         @relation("orderBy", fields: [userId], references: [id])
-  Book      Book          @relation("orderBook", fields: [bookId], references: [ISBN])
+  bookId    String?
+  newBookID String?       @db.VarChar(255)
+  status    OrderStatus
+  unit      Int
+  Book      books?        @relation("orderBooks", fields: [newBookID], references: [Id])
+  user      user?         @relation("orderBy", fields: [userId], references: [id])
+}
+
+model books {
+  Id              String  @id @db.VarChar(255)
+  Title           String? @db.VarChar(255)
+  Price           Int?
+  User_id         String? @db.VarChar(255)
+  review_summary  String? @db.VarChar(255)
+  review_text     String? @db.VarChar(255)
+  descriptions    String? @db.VarChar(255)
+  authors         String? @db.VarChar(255)
+  Image           String? @db.VarChar(255)
+  publisher       String? @db.VarChar(255)
+  categories      String? @db.VarChar(255)
+  ratingsCount    Int?
+  sentiment_label Int?
+  OrderBook       order[] @relation("orderBooks")
+}
+
+
+// model books {
+//   Id              String  @id @db.VarChar(255)
+//   Title           String? @db.VarChar(255)
+//   Price           Int?
+//   User_id         String? @db.VarChar(255)
+//   review_summary  String? @db.VarChar(255)
+//   review_text     String? @db.VarChar(255)
+//   descriptions    String? @db.VarChar(255)
+//   authors         String? @db.VarChar(255)
+//   Image           String? @db.VarChar(255)
+//   publisher       String? @db.VarChar(255)
+//   categories      String? @db.VarChar(255)
+//   ratingsCount    Int?
+//   sentiment_label Int?
+//   OrderBook       order[] @relation("orderBooks")
+// }
+
+model role {
+  id       Int     @id @default(autoincrement())
+  rolename String
+  status   Boolean @default(true)
+  user     user[]
+}
+
+model user {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique(map: "User_email_key")
+  name        String?
+  password    String
+  phoneNumber String
+  roleId      Int
+  token       String?
+  status      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime?
+  OrderBook   order[]   @relation("orderBy")
+  role        role      @relation(fields: [roleId], references: [id], map: "User_roleId_fkey")
+
+  @@index([roleId], map: "User_roleId_fkey")
 }
 
 enum OrderTypeEnum {
   ONLINE
   OFFLINE
+}
+
+enum OrderStatus {
+  ADDTOCART
+  PENDING
+  COMPLETE
 }

@@ -11,5 +11,5 @@ export class CreateOrderDto {
     @IsNumber()
     @ApiProperty()
     @IsNotEmpty()
-    bookId :number
+    bookId :string
 }

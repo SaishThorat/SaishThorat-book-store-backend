@@ -8,6 +8,7 @@ import { Roles } from 'src/utilities/contants';
 import { RolesGuards } from '../auth/guard/role.guard';
 import { JwtService } from '@nestjs/jwt';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('book')
 @ApiTags("book")
@@ -27,10 +28,10 @@ export class BookController {
   }
   
   @Get()
+  @Public()
   @ApiOperation({
     summary: Roles.ADMIN + ', ' + Roles.USER + ', ' + Roles.PUBLISHER,
   })
-  @AuthRoles([Roles.ADMIN,Roles.USER,Roles.PUBLISHER])
   async findAll() {
     try {
       return await this.bookService.findAll();
@@ -39,9 +40,25 @@ export class BookController {
     }
   }
 
+  @Get('/all')
+  @Public()
+  @ApiOperation({
+    summary: Roles.ADMIN + ', ' + Roles.USER + ', ' + Roles.PUBLISHER,
+  })
+  async findAllbooks() {
+    try {
+      return await this.bookService.findAllbook();
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   @Get(':id')
-  @AuthRoles([Roles.ADMIN,Roles.USER,Roles.PUBLISHER])
-  async findOne(@Param('id' ,ParseIntPipe) id: number) {
+  @Public()
+  @ApiOperation({
+    summary: Roles.ADMIN + ', ' + Roles.USER + ', ' + Roles.PUBLISHER,
+  })
+  async findOne(@Param('id') id: string) {
     try {
       return await this.bookService.findOne(id);
     } catch (error) {
@@ -50,6 +67,9 @@ export class BookController {
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: Roles.ADMIN + ', ' + Roles.USER + ', ' + Roles.PUBLISHER,
+  })
   @AuthRoles([Roles.ADMIN,Roles.USER,Roles.PUBLISHER])
   async update(@Param('id',ParseIntPipe) id: number, @Body() updateBookDto: UpdateBookDto) {
     try {
@@ -61,6 +81,9 @@ export class BookController {
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: Roles.ADMIN + ', ' + Roles.PUBLISHER,
+  })
   @AuthRoles([Roles.ADMIN,Roles.USER,Roles.PUBLISHER])
   async remove(@Param('id',ParseIntPipe) id: number) {
     try {

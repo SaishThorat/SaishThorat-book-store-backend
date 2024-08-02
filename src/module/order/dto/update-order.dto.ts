@@ -14,5 +14,5 @@ export class UpdateOrderDto  {
     @ApiProperty()
     @IsNotEmpty()
     @IsOptional()
-    bookId :number
+    bookId :string
 }

@@ -45,5 +45,12 @@ async login(loginInfo: LoginDto) {
     }
       return {token:accesstoken};
     }
+    
+async findMe(userId:number){
+  const user=await this.prismaService.user.findUnique({where:{id:userId}})
+  delete user.password;
+  return  user; 
+}
 
 }
+
